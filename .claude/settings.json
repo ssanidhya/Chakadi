@@ -1,0 +1,13 @@
+{
+    "env": {
+        "ANTHROPIC_BASE_URL": "http://localhost:20128",
+        "ANTHROPIC_AUTH_TOKEN": "sk-85df3ffa58729750-c2835a-87275658",
+        "CLAUDE_CODE_ENABLE_GATEWAY_MODEL_DISCOVERY": "1",
+        "ANTHROPIC_MODEL": "antigravity/gemini-3.6-flash-high",
+        "ANTHROPIC_DEFAULT_FABLE_MODEL": "antigravity/gemini-3.6-flash-high",
+        "ANTHROPIC_DEFAULT_OPUS_MODEL": "antigravity/gemini-pro-agent",
+        "ANTHROPIC_DEFAULT_SONNET_MODEL": "antigravity/claude-sonnet-4-6",
+        "ANTHROPIC_DEFAULT_HAIKU_MODEL": "antigravity/gemini-3.6-flash-low",
+        "CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS": "1"
+    }
+}
