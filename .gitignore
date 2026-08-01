@@ -5,6 +5,13 @@ node_modules/
 dist/
 dist-ssr/
 
+# AI / IDE / Internal tools
+.codex/
+.agents/
+.claude/
+doctor.json
+skills-lock.json
+
 # Editor / System files
 .DS_Store
 *.suo
