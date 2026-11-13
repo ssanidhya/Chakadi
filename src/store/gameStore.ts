@@ -12,6 +12,7 @@ import {
   parseCardId,
   Card,
 } from '../game/index.ts';
+import type { NetworkAdapter } from '../networking/adapter.ts';
 import { useSettingsStore } from './settingsStore.ts';
 import {
   playCardPlaySound,
@@ -20,6 +21,7 @@ import {
   playBidDingSound,
   triggerHapticVibration,
 } from '../utils/sound.ts';
+import { logInfo, logWarn } from '../utils/logger.ts';
 
 const DEFAULT_6P_PLAYERS: Player[] = [
   { id: 'p1', name: 'Player 1', teamId: 'team_a', seat: 0 },
@@ -34,6 +36,7 @@ interface GameStore {
   engine: GameEngineImpl;
   gameState: GameState;
   activeViewPlayerId: PlayerId;
+  activeAdapter: NetworkAdapter | null;
 
   // Actions
   startGame: (players?: Player[], config?: GameConfig) => void;
@@ -45,6 +48,8 @@ interface GameStore {
   startNextHand: (seed?: number) => void;
   resetGame: () => void;
   setActiveViewPlayerId: (playerId: PlayerId) => void;
+  setActiveAdapter: (adapter: NetworkAdapter | null) => void;
+  syncFromNetwork: (state: GameState) => void;
 
   // Derived Helpers
   getLegalCardsForActivePlayer: () => CardId[];
@@ -54,7 +59,9 @@ export const useGameStore = create<GameStore>((set, get) => {
   const initialEngine = new GameEngineImpl(DEFAULT_6P_PLAYERS, createDefaultGameConfig(6));
 
   const syncState = () => {
-    set({ gameState: initialEngine.getState() });
+    const activeEngine = get().engine;
+    const currentState = activeEngine.getState();
+    set({ gameState: currentState });
   };
 
   initialEngine.subscribe((event) => {
@@ -66,69 +73,148 @@ export const useGameStore = create<GameStore>((set, get) => {
     engine: initialEngine,
     gameState: initialEngine.getState(),
     activeViewPlayerId: 'p1',
+    activeAdapter: null,
 
     startGame: (players = DEFAULT_6P_PLAYERS, config = createDefaultGameConfig(players.length as 4 | 6)) => {
+      logInfo('STORE', 'Starting new game match', { playerCount: players.length });
       const newEngine = new GameEngineImpl(players, config);
+
       newEngine.subscribe((event) => {
-        set({ gameState: newEngine.getState() });
+        const currentState = newEngine.getState();
+        set({ gameState: currentState });
+
+        // Auto-switch view to current turn player during bidding/playing only if no activeAdapter (i.e. single device / dev match)
+        if (currentState.turnPlayerId && !get().activeAdapter) {
+          set({ activeViewPlayerId: currentState.turnPlayerId });
+        }
+
         handleAudioAndHaptics(event.type);
       });
+
       newEngine.dispatch({ type: 'START_GAME', players, config });
+
+      const firstState = newEngine.getState();
       set({
         engine: newEngine,
-        gameState: newEngine.getState(),
-        activeViewPlayerId: players[0]!.id,
+        gameState: firstState,
       });
+      if (!get().activeAdapter) {
+        set({ activeViewPlayerId: firstState.turnPlayerId || players[0]!.id });
+      }
     },
 
     dealHand: (seed) => {
-      const { engine } = get();
+      const { engine, activeAdapter } = get();
+      if (activeAdapter) {
+        activeAdapter.send({
+          type: 'DISPATCH_ACTION',
+          roomId: '',
+          action: { type: 'DEAL_HAND', seed },
+        });
+        return;
+      }
       engine.dispatch({ type: 'DEAL_HAND', seed });
       syncState();
     },
 
     placeBid: (playerId, tricks) => {
-      const { engine } = get();
+      const { engine, activeAdapter } = get();
+      if (activeAdapter) {
+        activeAdapter.send({
+          type: 'DISPATCH_ACTION',
+          roomId: '',
+          action: { type: 'PLACE_BID', playerId, tricks },
+        });
+        return { success: true };
+      }
       const res = engine.dispatch({ type: 'PLACE_BID', playerId, tricks });
       syncState();
       return { success: res.success, error: res.error };
     },
 
     passBid: (playerId) => {
-      const { engine } = get();
+      const { engine, activeAdapter } = get();
+      if (activeAdapter) {
+        activeAdapter.send({
+          type: 'DISPATCH_ACTION',
+          roomId: '',
+          action: { type: 'PASS_BID', playerId },
+        });
+        return { success: true };
+      }
       const res = engine.dispatch({ type: 'PASS_BID', playerId });
       syncState();
       return { success: res.success, error: res.error };
     },
 
     declareKaat: (playerId, suit) => {
-      const { engine } = get();
+      const { engine, activeAdapter } = get();
+      if (activeAdapter) {
+        activeAdapter.send({
+          type: 'DISPATCH_ACTION',
+          roomId: '',
+          action: { type: 'DECLARE_KAAT', playerId, suit },
+        });
+        return { success: true };
+      }
       const res = engine.dispatch({ type: 'DECLARE_KAAT', playerId, suit });
       syncState();
       return { success: res.success, error: res.error };
     },
 
     playCard: (playerId, cardId) => {
-      const { engine } = get();
+      const { engine, activeAdapter } = get();
+      if (activeAdapter) {
+        activeAdapter.send({
+          type: 'DISPATCH_ACTION',
+          roomId: '',
+          action: { type: 'PLAY_CARD', playerId, cardId },
+        });
+        return { success: true };
+      }
       const res = engine.dispatch({ type: 'PLAY_CARD', playerId, cardId });
       syncState();
       return { success: res.success, error: res.error };
     },
 
     startNextHand: (seed) => {
-      const { engine } = get();
+      const { engine, activeAdapter } = get();
+      if (activeAdapter) {
+        activeAdapter.send({
+          type: 'DISPATCH_ACTION',
+          roomId: '',
+          action: { type: 'START_NEXT_HAND', seed },
+        });
+        return;
+      }
       engine.dispatch({ type: 'START_NEXT_HAND', seed });
       syncState();
     },
 
     resetGame: () => {
-      const { engine } = get();
+      const { engine, activeAdapter } = get();
+      if (activeAdapter) {
+        activeAdapter.send({
+          type: 'DISPATCH_ACTION',
+          roomId: '',
+          action: { type: 'RESET_GAME' },
+        });
+        return;
+      }
       engine.reset();
       syncState();
     },
 
     setActiveViewPlayerId: (playerId) => {
       set({ activeViewPlayerId: playerId });
+    },
+
+    setActiveAdapter: (adapter) => {
+      set({ activeAdapter: adapter });
+    },
+
+    syncFromNetwork: (state) => {
+      set({ gameState: state });
     },
 
     getLegalCardsForActivePlayer: () => {

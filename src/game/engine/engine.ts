@@ -5,6 +5,7 @@ import { createInitialGameState } from './state.ts';
 import type { GameState } from './state.ts';
 import type { Player } from '../models/player.ts';
 import type { GameConfig } from '../models/game-config.ts';
+import { logInfo, logWarn } from '../../utils/logger.ts';
 
 export type Listener = (event: EngineEvent) => void;
 
@@ -21,6 +22,7 @@ export class GameEngineImpl implements GameEngine {
 
   constructor(players: Player[], config?: GameConfig, dealerId?: string) {
     this.state = createInitialGameState(players, config, dealerId);
+    logInfo('ENGINE', `Engine initialized for ${players.length} players`, { config: this.state.config });
   }
 
   public getState(): Readonly<GameState> {
@@ -30,6 +32,7 @@ export class GameEngineImpl implements GameEngine {
   public dispatch(action: GameAction): DispatchResult {
     const validation = validateAction(this.state, action);
     if (!validation.valid) {
+      logWarn('ENGINE', `Validation failed for action ${action.type}: ${validation.error}`, { action });
       return {
         success: false,
         state: this.state,
@@ -40,6 +43,11 @@ export class GameEngineImpl implements GameEngine {
     const previousState = this.state;
     const newState = reduceGame(this.state, action);
     this.state = newState;
+
+    logInfo('ENGINE', `Action ${action.type} reduced successfully`, {
+      phase: newState.phase,
+      turnPlayerId: newState.turnPlayerId,
+    });
 
     this.notifyListeners(previousState, newState, action);
 
@@ -60,6 +68,8 @@ export class GameEngineImpl implements GameEngine {
     const activePlayers = players || this.state.players;
     const activeConfig = config || this.state.config;
     this.state = createInitialGameState(activePlayers, activeConfig);
+
+    logInfo('ENGINE', 'Game reset triggered', { phase: this.state.phase });
 
     const event: EngineEvent = {
       type: 'GAME_STARTED',

@@ -17,8 +17,8 @@ The bridge obtains valid move affordances from engine selectors (`getLegalCards`
 | Setup | Player count, names, team seating, start game. |
 | Deal / Boli | Private hand, current bidder, highest Boli, pass/bid controls. |
 | Kaat declaration | Declarer-only suit chooser. |
-| Table | Central Haath, current Chaal, player hand, turn indicator, team trick count, Gunti. |
-| Settlement | Contract outcome, Haath totals, Gunti transfer, next dealer. |
+| Table | Central Haath, current Chaal, player hand, turn indicator, team trick count, Penalty Points (Pts). |
+| Settlement | Contract outcome, Haath totals, Penalty Points (Pts) transfer, next dealer. |
 | Match history (future) | Completed hands, bids, Kaat, settlement summary. |
 
 The active player’s hand is full size at the bottom; other players use compact seat indicators. On a shared device, a privacy hand-off screen must hide the outgoing player’s Patti before the next player views theirs.

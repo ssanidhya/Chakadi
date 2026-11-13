@@ -1,5 +1,4 @@
-import { describe, it } from 'node:test';
-import assert from 'node:assert/strict';
+import { describe, it, expect } from 'vitest';
 import { GameEngineImpl, createDefaultGameConfig } from '../../game/index.ts';
 import type { Player } from '../../game/index.ts';
 import { LocalAdapter } from '../localAdapter.ts';
@@ -33,9 +32,9 @@ describe('NetworkAdapter & LocalAdapter Tests', () => {
       maxPlayers: 6,
     });
 
-    assert.equal(adapter.getConnectionState(), 'connected');
-    assert.notEqual(receivedState, null);
-    assert.equal(receivedState.dealerId, 'p1');
+    expect(adapter.getConnectionState()).toBe('connected');
+    expect(receivedState).not.toBeNull();
+    expect(receivedState.dealerId).toBe('p1');
   });
 
   it('dispatches ClientMessage through LocalAdapter to update state', async () => {
@@ -54,7 +53,7 @@ describe('NetworkAdapter & LocalAdapter Tests', () => {
       action: { type: 'DEAL_HAND', seed: 999 },
     });
 
-    assert.equal(engine.getState().phase, 'BIDDING');
+    expect(engine.getState().phase).toBe('BIDDING');
   });
 
   it('validates wire messages using validateClientMessage', () => {
@@ -65,6 +64,6 @@ describe('NetworkAdapter & LocalAdapter Tests', () => {
     };
 
     const parseRes = validateClientMessage(validMessage);
-    assert.equal(parseRes.success, true);
+    expect(parseRes.success).toBe(true);
   });
 });

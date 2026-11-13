@@ -28,8 +28,8 @@ export function calculateHandSettlement(
   const contractSucceeded = declarerTricksWon >= contractBid;
   const penaltyAward = contractSucceeded ? contractBid : 2 * contractBid;
 
-  const opposingTeamId: TeamId = declarerTeamId === 'team_a' ? 'team_b' : 'team_a';
-  const awardedToTeamId: TeamId = contractSucceeded ? opposingTeamId : declarerTeamId;
+  const declarerOpposingTeamId: TeamId = declarerTeamId === 'team_a' ? 'team_b' : 'team_a';
+  const awardedToTeamId: TeamId = contractSucceeded ? declarerOpposingTeamId : declarerTeamId;
 
   const updatedScores: Record<TeamId, TeamScore> = {
     team_a: { ...currentScores.team_a!, tricksWon: 0 },
@@ -38,6 +38,7 @@ export function calculateHandSettlement(
 
   const dealer = players.find((p) => p.id === currentDealerId)!;
   const dealerTeamId = dealer.teamId;
+  const dealerOpposingTeamId: TeamId = dealerTeamId === 'team_a' ? 'team_b' : 'team_a';
 
   let nextDealerId = currentDealerId;
   let zeroCrossingOccurred = false;
@@ -46,13 +47,13 @@ export function calculateHandSettlement(
   if (awardedToTeamId === dealerTeamId) {
     updatedScores[dealerTeamId]!.penaltyPoints += penaltyAward;
   } else {
-    const currentDealerGunti = updatedScores[dealerTeamId]!.penaltyPoints;
-    const remainingAfterCancel = currentDealerGunti - penaltyAward;
+    const currentDealerPenalty = updatedScores[dealerTeamId]!.penaltyPoints;
+    const remainingAfterCancel = currentDealerPenalty - penaltyAward;
 
     if (remainingAfterCancel < 0) {
       const carryOver = Math.abs(remainingAfterCancel);
       updatedScores[dealerTeamId]!.penaltyPoints = 0;
-      updatedScores[opposingTeamId]!.penaltyPoints += carryOver;
+      updatedScores[dealerOpposingTeamId]!.penaltyPoints += carryOver;
       zeroCrossingOccurred = true;
     } else {
       updatedScores[dealerTeamId]!.penaltyPoints = remainingAfterCancel;

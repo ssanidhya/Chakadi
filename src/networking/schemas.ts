@@ -24,6 +24,20 @@ export function validateClientMessage(message: any): { success: boolean; data?: 
     return { success: true, data: message as ClientMessage };
   }
 
+  if (type === 'SELECT_TEAM') {
+    if (!message.roomId || !message.playerId || (message.teamId !== 'team_a' && message.teamId !== 'team_b')) {
+      return { success: false, error: 'Invalid SELECT_TEAM payload.' };
+    }
+    return { success: true, data: message as ClientMessage };
+  }
+
+  if (type === 'HOST_MOVE_PLAYER') {
+    if (!message.roomId || !message.targetPlayerId || !['team_a', 'team_b', 'unassigned'].includes(message.newTeamId)) {
+      return { success: false, error: 'Invalid HOST_MOVE_PLAYER payload.' };
+    }
+    return { success: true, data: message as ClientMessage };
+  }
+
   if (type === 'DISPATCH_ACTION') {
     if (!message.roomId || !message.action || typeof message.action.type !== 'string') {
       return { success: false, error: 'Invalid DISPATCH_ACTION payload.' };

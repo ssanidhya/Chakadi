@@ -9,6 +9,7 @@ import type {
   MessageListener,
 } from './adapter.ts';
 import { validateClientMessage } from './schemas.ts';
+import { logInfo, logWarn, logError } from '../utils/logger.ts';
 
 export class LocalAdapter implements NetworkAdapter {
   private connectionState: ConnectionState = 'disconnected';
@@ -31,10 +32,12 @@ export class LocalAdapter implements NetworkAdapter {
     });
 
     this.connectionState = 'connected';
+    logInfo('P2P', `LocalAdapter connected to room ${room.roomId} as player ${this.playerId}`);
     this.broadcastState();
   }
 
   public async disconnect(): Promise<void> {
+    logInfo('P2P', `LocalAdapter disconnecting player ${this.playerId}`);
     this.connectionState = 'disconnected';
   }
 
@@ -46,12 +49,15 @@ export class LocalAdapter implements NetworkAdapter {
         error: validation.error || 'Invalid wire message format.',
         action: (message as any).action || { type: 'RESET_GAME' },
       });
+      logWarn('P2P', `LocalAdapter rejected invalid message`, { error: validation.error });
       return;
     }
 
     if (message.type === 'DISPATCH_ACTION') {
+      logInfo('P2P', `LocalAdapter dispatching action`, { type: message.action.type });
       const res = this.engine.dispatch(message.action);
       if (!res.success) {
+        logWarn('P2P', `Action rejected by engine`, { error: res.error, action: message.action });
         this.emit({
           type: 'ACTION_REJECTED',
           error: res.error || 'Action failed engine validation.',

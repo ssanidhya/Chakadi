@@ -18,9 +18,9 @@ This document defines the house-rule variant of Chakadi used by this project. It
 | `Paan` / `Lal` | Hearts (`♥`). |
 | `Eet` | Diamonds (`♦`). |
 | `Chidi` / `Chidri` | Clubs (`♣`). |
-| `Gunti` / `Dhaand` | Accumulated penalty points; lower is better. Wraps around at 48. |
-| `Coat` / `Kot` | Major loss tally awarded when a team reaches 48 Gunti. Lower is better. |
-| `Dealer team` | The team of the current dealer. It retains the deal until its Gunti is cleared and transferred. |
+| `Penalty Points (Pts)` / `Dhaand` | Accumulated penalty points; lower is better. Wraps around at 48. |
+| `Coat` / `Kot` | Major loss tally awarded when a team reaches 48 Penalty Points (Pts). Lower is better. |
+| `Dealer team` | The team of the current dealer. It retains the deal until its Penalty Points (Pts) is cleared and transferred. |
 | `Declarer` | The player who wins the Boli. |
 
 ## Table Configuration
@@ -74,47 +74,47 @@ Boli closes when a full rotation of passes occurs following the highest bid (i.e
 7. The winning team receives one trick count, regardless of which teammate won the Haath.
 8. Players must not communicate their holdings through speech, signals, or revealed cards.
 
-## Contract Result and Gunti
+## Contract Result and Penalty Points (Pts)
 
 Let `n` be the winning Boli and `declarerTricks` be the number of Haath won by the Declarer's team.
 
-| Result | Condition | Gunti added |
+| Result | Condition | Penalty Points (Pts) added |
 | --- | --- | --- |
 | Contract succeeds | `declarerTricks >= n` | Opposing team receives `n` |
 | Contract fails | `declarerTricks < n` | Declarer's team receives `2 × n` |
 
-Gunti is a penalty: the game goal is to move Gunti onto the opposing team and keep the player's own team clear.
+Penalty Points (Pts) is a penalty: the game goal is to move Penalty Points (Pts) onto the opposing team and keep the player's own team clear.
 
-## Dealer Rotation, Gunti Transfer, and 48-Point Coat (Kot)
+## Dealer Rotation, Penalty Points (Pts) Transfer, and 48-Point Coat (Kot)
 
 The current dealer's team is special for score settlement and deal rotation:
 
-### 1. Standard Gunti Addition and Transfer
-* **Adding Gunti to Dealer Team**: When Gunti is added to the dealer team, add it directly to their total. If the total stays under 48, the **same dealer deals again**.
-* **Adding Gunti to Opposing Team (Cancellation & Transfer)**: When Gunti is awarded to the opposing team, it first cancels out the dealer team's existing Gunti:
-  * If the dealer team's Gunti remains positive (and under 48), the **same dealer deals again**.
-  * If the cancellation brings the dealer team's Gunti to **zero or lower**, the excess points carry over as Gunti for the opposing team: `opponentGunti = award - priorDealerGunti`.
-  * **Clockwise Dealer Transfer**: When Gunti crosses zero to the opposing team, the deal passes to the **next player clockwise** (who belongs to the opposing team). The opposing team becomes the new dealer team.
+### 1. Standard Penalty Points (Pts) Addition and Transfer
+* **Adding Penalty Points (Pts) to Dealer Team**: When Penalty Points (Pts) is added to the dealer team, add it directly to their total. If the total stays under 48, the **same dealer deals again**.
+* **Adding Penalty Points (Pts) to Opposing Team (Cancellation & Transfer)**: When Penalty Points (Pts) is awarded to the opposing team, it first cancels out the dealer team's existing Penalty Points (Pts):
+  * If the dealer team's Penalty Points (Pts) remains positive (and under 48), the **same dealer deals again**.
+  * If the cancellation brings the dealer team's Penalty Points (Pts) to **zero or lower**, the excess points carry over as Penalty Points (Pts) for the opposing team: `opponentPenalty Points (Pts) = award - priorDealerPenalty Points (Pts)`.
+  * **Clockwise Dealer Transfer**: When Penalty Points (Pts) crosses zero to the opposing team, the deal passes to the **next player clockwise** (who belongs to the opposing team). The opposing team becomes the new dealer team.
 
 ### 2. 48-Point Threshold & Coat (Kot) Mechanics
-When a team's accumulated Gunti reaches or exceeds **48 points** (`Gunti >= 48`):
+When a team's accumulated Penalty Points (Pts) reaches or exceeds **48 points** (`Penalty Points (Pts) >= 48`):
 * **Coat (Kot) Award**: The team reaching 48 points receives **+1 Coat** (major penalty marker).
-* **Point Reduction**: 48 points are deducted from that team's total: `newGunti = totalGunti - 48`.
+* **Point Reduction**: 48 points are deducted from that team's total: `newPenalty Points (Pts) = totalPenalty Points (Pts) - 48`.
 * **Coat Reduction**: If a team that previously had Coat points forces the opposing team to hit 48 points, the winning team's Coat total is reduced by 1 (`Coat = max(0, Coat - 1)`).
 * **Same-Team Dealer Rotation**: Hitting 48 points triggers a deal rotation **within the same team**: the deal passes to the **next player on the same team** (2 seats clockwise in 4-player, or 2 seats clockwise in 6-player).
-* **Independence of Coat and Dealership**: `Coat` markers track major game losses and do **not** alter the Gunti-based dealership transfer logic.
+* **Independence of Coat and Dealership**: `Coat` markers track major game losses and do **not** alter the Penalty Points (Pts)-based dealership transfer logic.
 
 ### Example Walkthrough
-1. Dealer team starts with **46 Gunti**.
-2. Dealer team fails contract (or opponents score), adding **5 Gunti** to the dealer team: `46 + 5 = 51 Gunti`.
+1. Dealer team starts with **46 Penalty Points (Pts)**.
+2. Dealer team fails contract (or opponents score), adding **5 Penalty Points (Pts)** to the dealer team: `46 + 5 = 51 Penalty Points (Pts)`.
 3. Since `51 >= 48`:
    * Dealer team receives **+1 Coat**.
-   * Dealer team Gunti resets to `51 - 48 = 3 Gunti`.
+   * Dealer team Penalty Points (Pts) resets to `51 - 48 = 3 Penalty Points (Pts)`.
    * Deal stays with the dealer team, but passes to the **next member of the same team**.
-4. On the next hand, the opposing team wins a contract awarding **10 Gunti** against the dealer team:
-   * Dealer team Gunti becomes `3 - 10 = -7`.
-   * Dealer team Gunti clears to `0`, and opposing team receives `7 Gunti`.
-   * Since Gunti crossed zero, deal passes to the **next player clockwise** (on the opposing team).
+4. On the next hand, the opposing team wins a contract awarding **10 Penalty Points (Pts)** against the dealer team:
+   * Dealer team Penalty Points (Pts) becomes `3 - 10 = -7`.
+   * Dealer team Penalty Points (Pts) clears to `0`, and opposing team receives `7 Penalty Points (Pts)`.
+   * Since Penalty Points (Pts) crossed zero, deal passes to the **next player clockwise** (on the opposing team).
    * The previous team retains their **1 Coat**; Coat total is unaffected by zero-crossing transfers.
 
 ## Match End Condition

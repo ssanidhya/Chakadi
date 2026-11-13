@@ -41,7 +41,7 @@ LOBBY
 - `BIDDING`: only the bidding player can pass or bid above the current bid.
 - `DECLARING_KAAT`: only the Declarer selects a suit.
 - `PLAYING_HAATH`: exactly one player owns the next Chaal; eight or thirteen Haath resolve according to variant.
-- `HAND_SETTLEMENT`: calculate contract result, Gunti cancellation/transfer, 48-point Coat wrap-around, same-team/clockwise dealer rotation, and match-end check atomically.
+- `HAND_SETTLEMENT`: calculate contract result, Penalty Points (Pts) cancellation/transfer, 48-point Coat wrap-around, same-team/clockwise dealer rotation, and match-end check atomically.
 - `GAME_OVER`: reserved for an explicit future match-end policy.
 
 ## Serializable State

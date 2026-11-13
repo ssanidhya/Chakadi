@@ -33,6 +33,7 @@ export interface GameState {
   turnPlayerId?: PlayerId;
   actionNumber: number;
   lastSettlement?: HandSettlement;
+  handHistory: HandSettlement[];
   winningTeamId?: TeamId;
 }
 
@@ -63,5 +64,6 @@ export function createInitialGameState(
     bid: createInitialBidState(),
     completedTricks: [],
     actionNumber: 0,
+    handHistory: [],
   };
 }

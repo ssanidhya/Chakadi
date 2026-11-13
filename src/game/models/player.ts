@@ -1,4 +1,4 @@
-export type TeamId = 'team_a' | 'team_b';
+export type TeamId = 'team_a' | 'team_b' | 'unassigned';
 export type PlayerId = string;
 
 export interface Player {

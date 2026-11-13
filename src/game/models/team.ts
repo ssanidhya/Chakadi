@@ -2,7 +2,7 @@ import type { TeamId } from './player.ts';
 
 export interface TeamScore {
   teamId: TeamId;
-  penaltyPoints: number; // Gunti / Dhaand (wraps around at target threshold e.g. 48)
+  penaltyPoints: number; // Penalty Points / Pts (wraps around at target threshold e.g. 48)
   coat: number;          // Kot (major loss tally)
   tricksWon: number;     // Tricks won in current hand
 }

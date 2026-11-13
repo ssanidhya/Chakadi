@@ -251,6 +251,7 @@ export function reduceGame(state: GameState, action: GameAction): GameState {
           completedTricks: newCompletedTricks,
           currentTrick: undefined,
           lastSettlement: settlement,
+          handHistory: [...(state.handHistory || []), settlement],
           phase: settlement.isGameOver ? 'GAME_OVER' : 'HAND_SETTLEMENT',
           winningTeamId: settlement.winnerTeamId,
           turnPlayerId: undefined,
@@ -283,6 +284,7 @@ export function reduceGame(state: GameState, action: GameAction): GameState {
         scores: resetScores,
         phase: 'DEALING',
         lastSettlement: undefined,
+        handHistory: [],
         winningTeamId: undefined,
       });
     }
